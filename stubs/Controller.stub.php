@@ -15,6 +15,7 @@ class {{modelName}}Controller extends AdminBaseController {
 	 * @var {{modelNamePlural}}
 	 */
 	protected ${{modelNamePluralLowerCase}};
+	
 	/**
 	 * Create a new {{modelName}}Controller instance
 	 * @param {{modelName}} ${{modelNamePluralLowerCase}}
