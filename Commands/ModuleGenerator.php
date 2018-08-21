@@ -59,21 +59,32 @@ class ModuleGenerator extends Command
         return file_get_contents(resource_path("stubs/$type.stub.php"));
     }
 
-    protected function model()
+    protected function render($stub, $tree = '')
     {
-        $modelTemplate = str_replace(
+        $viewTemplate = str_replace(
             [
                 '{{moduleName}}',
                 '{{modelName}}',
+                '{{modelNamePlural}}',
                 '{{modelNamePluralLowerCase}}',
+                '{{modelNameLowerCase}}'
             ],
             [
                 $this->module,
                 $this->model,
+                str_plural($this->model),
                 strtolower(str_plural($this->model)),
+                strtolower($this->model)
             ],
-            $this->getStub('Model')
+            $this->getStub($tree . $value)
         );
+
+        return $viewTemplate;
+    }
+
+    protected function model()
+    {
+        $modelTemplate = $this->render('Model');
 
         if(!file_exists($path = base_path("admin/" . $this->module . '/Models')))
             mkdir($path, 0777, true);
@@ -84,21 +95,7 @@ class ModuleGenerator extends Command
 
     protected function controller()
     {
-        $controllerTemplate = str_replace(
-            [
-                '{{moduleName}}',
-                '{{modelName}}',
-                '{{modelNamePluralLowerCase}}',
-                '{{modelNameLowerCase}}'
-            ],
-            [
-                $this->module,
-                $this->model,
-                strtolower(str_plural($this->model)),
-                strtolower($this->model)
-            ],
-            $this->getStub('Controller')
-        );
+        $controllerTemplate = $this->render('Controller');
 
         if(!file_exists($path = base_path("admin/" . $this->module . '/Controllers')))
             mkdir($path, 0777, true);
@@ -109,17 +106,7 @@ class ModuleGenerator extends Command
 
     protected function request()
     {
-        $requestTemplate = str_replace(
-            [
-                '{{moduleName}}',
-                '{{modelName}}',
-            ],
-            [
-                $this->module,
-                $this->model,
-            ],
-            $this->getStub('Request')
-        );
+        $requestTemplate = $this->render('Request');
 
         if(!file_exists($path = base_path("admin/" . $this->module . '/Requests')))
             mkdir($path, 0777, true);
@@ -130,21 +117,7 @@ class ModuleGenerator extends Command
 
     protected function datatable()
     {
-        $datatableTemplate = str_replace(
-            [
-                '{{moduleName}}',
-                '{{modelName}}',
-                '{{modelNamePluralLowerCase}}',
-                '{{modelNameLowerCase}}'
-            ],
-            [
-                $this->module,
-                $this->model,
-                strtolower(str_plural($this->model)),
-                strtolower($this->model)
-            ],
-            $this->getStub('Datatable')
-        );
+        $datatableTemplate = $this->render('Datatable');
 
         if(!file_exists($path = base_path("admin/" . $this->module . '/Datatables')))
             mkdir($path, 0777, true);
@@ -155,21 +128,7 @@ class ModuleGenerator extends Command
 
     protected function moduleprovider()
     {
-        $moduleproviderTemplate = str_replace(
-            [
-                '{{moduleName}}',
-                '{{modelName}}',
-                '{{modelNamePluralLowerCase}}',
-                '{{modelNameLowerCase}}'
-            ],
-            [
-                $this->module,
-                $this->model,
-                strtolower(str_plural($this->model)),
-                strtolower($this->model)
-            ],
-            $this->getStub('ModuleProvider')
-        );
+        $moduleproviderTemplate = $this->render('ModuleProvider');
 
         if(!file_exists($path = base_path("admin/" . $this->module . '/Providers')))
             mkdir($path, 0777, true);
@@ -197,23 +156,7 @@ class ModuleGenerator extends Command
         $crudViews = ['index', 'edit', 'create'];
 
         foreach ($crudViews as $key => $value) {
-            $viewTemplate = str_replace(
-                [
-                    '{{moduleName}}',
-                    '{{modelName}}',
-                    '{{modelNamePlural}}',
-                    '{{modelNamePluralLowerCase}}',
-                    '{{modelNameLowerCase}}'
-                ],
-                [
-                    $this->module,
-                    $this->model,
-                    str_plural($this->model),
-                    strtolower(str_plural($this->model)),
-                    strtolower($this->model)
-                ],
-                $this->getStub('view.' . $value)
-            );
+            $viewTemplate = $this->render($value, 'view.');
 
             if(!file_exists($path = base_path("resources/views/admin/" . str_plural($this->model))))
                 mkdir($path, 0777, true);
